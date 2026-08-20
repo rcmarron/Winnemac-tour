@@ -410,6 +410,13 @@ h1 {
   z-index: 500;
 }
 
+/* While following, the button is a state readout more than an invitation. */
+.map__recentre--following {
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  border: 1px solid var(--leaf);
+  color: var(--leaf);
+}
+
 .map__legend {
   position: absolute;
   left: 0.6rem;
