@@ -12,6 +12,8 @@ export interface Notice {
   kind: 'stop' | 'badge'
   title: string
   detail: string
+  /** Set on arrival notices, so the shell can start that stop's narration. */
+  stopId?: string
 }
 
 /** Progress lives in localStorage on this one phone -- no accounts. */
@@ -73,6 +75,7 @@ export function useProgress(stops: readonly Stop[]) {
               kind: 'stop' as const,
               title: stop?.isMystery ? 'Hidden stop found!' : 'Stop unlocked',
               detail: stop?.name ?? 'A new stop',
+              stopId: id,
             }
           }),
         ].slice(-MAX_NOTICES))

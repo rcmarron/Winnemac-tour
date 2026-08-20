@@ -14,6 +14,7 @@ interface StopSheetProps {
   expanded: boolean
   onToggle: () => void
   onRevealQuiz: (stopId: string) => void
+  onPlayNarration: (stop: Stop) => void
 }
 
 export function StopSheet({
@@ -23,6 +24,7 @@ export function StopSheet({
   expanded,
   onToggle,
   onRevealQuiz,
+  onPlayNarration,
 }: StopSheetProps) {
   const nearby = nearestStops(stops, progress.unlockedStopIds, position, PEEK_COUNT)
 
@@ -50,6 +52,7 @@ export function StopSheet({
             progress={progress}
             position={position}
             onRevealQuiz={onRevealQuiz}
+            onPlayNarration={onPlayNarration}
           />
         ) : (
           <ul className="nearby">

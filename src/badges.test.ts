@@ -76,6 +76,40 @@ describe('earnedBadgeIds', () => {
   })
 })
 
+describe('Keen Eye', () => {
+  const secrets = [
+    stop({ id: 's1', isMystery: true }),
+    stop({ id: 's2', isMystery: true }),
+    stop({ id: 's3', isMystery: true }),
+  ]
+
+  it('is withheld while a hidden stop is unfound', () => {
+    const earned = earnedBadgeIds([quizzed('a'), ...secrets], progress(['a', 's1', 's2'], ['a']))
+    expect(earned).not.toContain('keen-eye')
+  })
+
+  it('is awarded once every hidden stop is found', () => {
+    const earned = earnedBadgeIds(
+      [quizzed('a'), ...secrets],
+      progress(['a', 's1', 's2', 's3'], ['a']),
+    )
+    expect(earned).toContain('keen-eye')
+  })
+
+  it('does not depend on quizzes or on visiting every signposted stop', () => {
+    const earned = earnedBadgeIds(
+      [quizzed('a'), quizzed('b'), ...secrets],
+      progress(['s1', 's2', 's3']),
+    )
+    expect(earned).toContain('keen-eye')
+    expect(earned).not.toContain('park-naturalist')
+  })
+
+  it('is not awarded on a tour with no hidden stops at all', () => {
+    expect(earnedBadgeIds([quizzed('a')], progress(['a'], ['a']))).not.toContain('keen-eye')
+  })
+})
+
 describe('findBadge', () => {
   it('finds a badge by id', () => {
     expect(findBadge('park-naturalist')?.name).toBe('Park Naturalist')

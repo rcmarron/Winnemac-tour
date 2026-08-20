@@ -104,6 +104,24 @@ of plausible spots rather than a survey. `stops.test.ts` guards the geography:
 every stop, and its whole trigger zone, must fall inside the park, no two zones
 may overlap, and every mystery must carry a hint.
 
-Still to come: the five mystery stops and the Keen Eye badge, plus audio and
-video (Phase 3), and the donation link (Phase 4). Stop names, exact positions,
-radii, and quiz copy all still need confirming with the Park Council.
+## Phase 3 (current state)
+
+- **Five hidden stops**, teased in the journal as `???` with a hint each, and
+  absent from the map -- found or not -- so discovery stays a discovery.
+- **Keen Eye**, awarded for finding all five. It does not wait on the
+  signposted stops, and the signposted count ignores mysteries, so the two
+  strands never hold each other back.
+- **Narration** (`useNarration.ts`) -- one player for the whole tour, started
+  automatically on arrival at a stop that has audio. Browsers block audio no
+  gesture asked for, so a refused autoplay leaves the bar up with a play
+  button rather than failing silently.
+- **Video** (`VideoEmbed.tsx`) -- YouTube links are converted to privacy-mode
+  embeds; a link we cannot parse renders as a plain link, never a broken
+  player. No stop carries a video yet: add a `videoUrl` when there is real
+  footage.
+
+`public/media/placeholder-narration.wav` is a two-tone stand-in so the audio
+path is real and testable. Replace it with the Council's recordings.
+
+Still to come: the donation link (Phase 4). Stop names, exact positions, radii,
+quiz copy, and all media still need confirming with the Park Council.

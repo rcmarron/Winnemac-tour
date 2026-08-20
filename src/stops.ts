@@ -32,6 +32,8 @@ export const stops: Stop[] = [
     radius: 30,
     isMystery: false,
     text: 'Placeholder text for the restored prairie on the east side of the park.',
+    // App-relative, so it survives the /Winnemac-tour/ base path.
+    audioUrl: 'media/placeholder-narration.wav',
     quiz: {
       question: 'Why are prairie plants so deep-rooted?',
       answer: 'Placeholder answer — to be written with the Council.',
@@ -70,6 +72,8 @@ export const stops: Stop[] = [
     isMystery: false,
     text: 'Placeholder text for the oaks along the western path.',
   },
+  // The five hidden stops. All of them sit on sanctioned paths -- unmarked, but
+  // never off-trail into planting beds or anywhere unsafe.
   {
     id: 'mystery-1',
     name: 'Unknown',
@@ -78,6 +82,46 @@ export const stops: Stop[] = [
     radius: 20,
     isMystery: true,
     mysteryHint: 'Something waits where the path bends toward the south-east corner.',
-    text: 'Placeholder text for a mystery stop.',
+    text: 'Placeholder text for the first mystery stop.',
+  },
+  {
+    id: 'mystery-2',
+    name: 'Unknown',
+    latitude: 41.97530,
+    longitude: -87.68280,
+    radius: 20,
+    isMystery: true,
+    mysteryHint: 'Near the north-west path, easy to walk straight past.',
+    text: 'Placeholder text for the second mystery stop.',
+  },
+  {
+    id: 'mystery-3',
+    name: 'Unknown',
+    latitude: 41.97350,
+    longitude: -87.67990,
+    radius: 20,
+    isMystery: true,
+    mysteryHint: 'Along the eastern edge, where the city noise drops away.',
+    text: 'Placeholder text for the third mystery stop.',
+  },
+  {
+    id: 'mystery-4',
+    name: 'Unknown',
+    latitude: 41.97460,
+    longitude: -87.68350,
+    radius: 20,
+    isMystery: true,
+    mysteryHint: 'Look low, on the western path, between the older trees.',
+    text: 'Placeholder text for the fourth mystery stop.',
+  },
+  {
+    id: 'mystery-5',
+    name: 'Unknown',
+    latitude: 41.97290,
+    longitude: -87.68250,
+    radius: 20,
+    isMystery: true,
+    mysteryHint: 'The quiet south-west corner keeps one more.',
+    text: 'Placeholder text for the fifth mystery stop.',
   },
 ]

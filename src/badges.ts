@@ -22,6 +22,11 @@ export const BADGES: readonly Badge[] = [
     name: 'Park Naturalist',
     description: 'Visited every stop and looked at every question.',
   },
+  {
+    id: 'keen-eye',
+    name: 'Keen Eye',
+    description: 'Found every hidden stop in the park.',
+  },
 ]
 
 export const findBadge = (id: string): Badge | undefined => BADGES.find((b) => b.id === id)
@@ -37,7 +42,7 @@ interface Earned {
  *
  * Mystery stops deliberately don't count toward the signposted totals: finding
  * a hidden stop is a bonus, and never finding one shouldn't make the tour look
- * unfinished. (Keen Eye, for all five mysteries, arrives with Phase 3.)
+ * unfinished. Keen Eye is the badge that rewards finding them.
  */
 export function earnedBadgeIds(stops: readonly Stop[], progress: Earned): string[] {
   const unlocked = new Set(progress.unlockedStopIds)
@@ -60,6 +65,11 @@ export function earnedBadgeIds(stops: readonly Stop[], progress: Earned): string
   const everyQuestionSeen = naturalistQuizzes.every((stop) => revealed.has(stop.id))
 
   if (everyStopVisited && everyQuestionSeen) earned.push('park-naturalist')
+
+  const mysteries = stops.filter((stop) => stop.isMystery)
+  if (mysteries.length > 0 && mysteries.every((stop) => unlocked.has(stop.id))) {
+    earned.push('keen-eye')
+  }
 
   return earned
 }

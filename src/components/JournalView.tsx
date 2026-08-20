@@ -9,9 +9,16 @@ interface JournalViewProps {
   progress: Progress
   position: Coordinates | null
   onRevealQuiz: (stopId: string) => void
+  onPlayNarration: (stop: Stop) => void
 }
 
-export function JournalView({ stops, progress, position, onRevealQuiz }: JournalViewProps) {
+export function JournalView({
+  stops,
+  progress,
+  position,
+  onRevealQuiz,
+  onPlayNarration,
+}: JournalViewProps) {
   const { unlockedStopIds, revealedQuizStopIds, earnedBadgeIds } = progress
 
   return (
@@ -26,6 +33,7 @@ export function JournalView({ stops, progress, position, onRevealQuiz }: Journal
             quizRevealed={revealedQuizStopIds.includes(stop.id)}
             position={position}
             onRevealQuiz={onRevealQuiz}
+            onPlayNarration={onPlayNarration}
           />
         ))}
       </ul>

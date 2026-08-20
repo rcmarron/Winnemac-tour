@@ -275,6 +275,12 @@ h1 {
   pointer-events: none;
 }
 
+/* Banners are fixed to the bottom, so they step up out of the narration bar's
+   way whenever it is on screen. */
+.notices--above-narration {
+  bottom: calc(3.3rem + env(safe-area-inset-bottom));
+}
+
 .notice {
   display: flex;
   align-items: center;
@@ -631,4 +637,85 @@ h1 {
 
 .leaflet-control-attribution {
   font-size: 0.65rem;
+}
+
+/* Narration bar */
+
+.narration {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.9rem calc(0.5rem + env(safe-area-inset-bottom));
+  background: var(--leaf);
+  color: var(--leaf-ink);
+}
+
+.narration__play {
+  flex: none;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.narration__label {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.narration__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.narration__state {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.narration__close {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0 0.2rem;
+  cursor: pointer;
+}
+
+/* Video */
+
+.entry__media {
+  margin: 0.75rem 0 0;
+}
+
+.video {
+  margin-top: 0.85rem;
+}
+
+.video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 0.6rem;
+  display: block;
+}
+
+.video--link {
+  margin-top: 0.85rem;
+  font-size: 0.9rem;
 }

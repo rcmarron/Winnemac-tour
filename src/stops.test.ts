@@ -38,6 +38,10 @@ describe('stops', () => {
     }
   })
 
+  it('has the five hidden stops the tour promises', () => {
+    expect(stops.filter((stop) => stop.isMystery)).toHaveLength(5)
+  })
+
   it('gives every mystery stop a hint to tease it in the journal', () => {
     for (const stop of stops.filter((s) => s.isMystery)) {
       expect(stop.mysteryHint?.length ?? 0).toBeGreaterThan(0)

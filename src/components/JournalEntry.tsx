@@ -1,3 +1,4 @@
+import { VideoEmbed } from './VideoEmbed'
 import { distanceInMeters, type Coordinates } from '../geo'
 import type { Stop } from '../types'
 
@@ -7,6 +8,7 @@ interface JournalEntryProps {
   quizRevealed: boolean
   position: Coordinates | null
   onRevealQuiz: (stopId: string) => void
+  onPlayNarration: (stop: Stop) => void
 }
 
 function describeDistance(meters: number): string {
@@ -20,6 +22,7 @@ export function JournalEntry({
   quizRevealed,
   position,
   onRevealQuiz,
+  onPlayNarration,
 }: JournalEntryProps) {
   const hidden = stop.isMystery && !unlocked
   const distance = position && !hidden ? distanceInMeters(position, stop) : null
@@ -53,6 +56,20 @@ export function JournalEntry({
           {distance === null ? '' : ` — ${describeDistance(distance)}`}
         </p>
       )}
+
+      {unlocked && stop.audioUrl && (
+        <p className="entry__media">
+          <button
+            type="button"
+            className="button button--small button--quiet"
+            onClick={() => onPlayNarration(stop)}
+          >
+            Play narration
+          </button>
+        </p>
+      )}
+
+      {unlocked && stop.videoUrl && <VideoEmbed url={stop.videoUrl} stopName={stop.name} />}
 
       {unlocked && stop.quiz && (
         <div className="quiz">
