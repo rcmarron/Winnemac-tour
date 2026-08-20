@@ -19,5 +19,5 @@ Node 20+ is expected (this repo is developed on Node 22).
 ## Claude Code on the web
 
 `.claude/hooks/session-start.sh` runs on session start in remote sessions and
-installs dependencies so linting and tests work immediately. It is a no-op
+installs dependencies in the background so linting and tests work. It is a no-op
 locally.
