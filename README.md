@@ -105,10 +105,24 @@ already mapped. Attribution is required and is rendered by the map.
 the same data the basemap is drawn from, so stops and paths agree. It is
 bounded by Foster Ave, Damen Ave, Argyle St and Leavitt St, about 400 m square.
 
-The stops in `src/stops.ts` sit inside that outline, but they are approximations
-of plausible spots rather than a survey. `stops.test.ts` guards the geography:
-every stop, and its whole trigger zone, must fall inside the park, no two zones
-may overlap, and every mystery must carry a hint.
+The stops in `src/stops.ts` sit inside that outline. Their content is
+researched (sources below); their coordinates are not surveyed -- they place
+each stop in the right part of the park and want checking on foot.
+`stops.test.ts` guards the geography: every stop, and its whole trigger zone,
+must fall inside the park, no two zones may overlap, and every mystery must
+carry a hint.
+
+Sources for the stop content:
+
+- Winnemac Park Advisory Council, "Our Prairies" -- the Potawatomi prairie
+  names, the species list, stewardship.
+- Chicago Park District, Winnemac Park Natural Area -- three acres, three
+  sections.
+- Wikipedia, Winnemac Park and Winnemac Stadium -- chief Winamac, 1910
+  founding, the schools, the 1999 renovation, the 1956 National Challenge Cup
+  final, Jorndt Field.
+- Illinois Extension and Illinois DNR on Royal Catchfly (*Silene regia*) --
+  state-endangered since 1980, pollinated by the ruby-throated hummingbird.
 
 ## Phase 3 (current state)
 
