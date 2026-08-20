@@ -141,5 +141,17 @@ under 6 m as GPS noise so the verdict doesn't flap while standing still. An
 arrival at some *other* stop does not end a hunt in progress; finding the
 hunted stop does, with the reveal.
 
-Still to come: the donation link (Phase 4). Stop names, exact positions, radii,
-quiz copy, and all media still need confirming with the Park Council.
+## Phase 4: supporting the park
+
+Once Park Naturalist is earned, the journal opens with a finish panel and a
+"Support the Park" link to the Council's own SwipeSimple page
+(`src/donation.ts`). It appears only at the finish -- not as a standing ask over
+someone's walk -- and stays available afterwards so a visitor can give later.
+
+The app never handles money: no form, no card fields, no request to the payment
+host. It is a plain outbound link, opened in a new tab with `rel="noreferrer"`,
+and the panel says where it goes before you tap it. Tests assert the URL is the
+Council's https page and that the app makes no request to it.
+
+Still outstanding: stop names, exact positions, radii, quiz copy, and all media
+need confirming with the Park Council.

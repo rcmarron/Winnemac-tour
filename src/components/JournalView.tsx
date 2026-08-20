@@ -1,5 +1,7 @@
 import { BadgeShelf } from './BadgeShelf'
 import { JournalEntry } from './JournalEntry'
+import { SupportPanel } from './SupportPanel'
+import { showSupportInvitation } from '../donation'
 import type { Coordinates } from '../geo'
 import type { Progress } from '../storage'
 import type { Stop } from '../types'
@@ -25,6 +27,7 @@ export function JournalView({
 
   return (
     <>
+      {showSupportInvitation(earnedBadgeIds) && <SupportPanel />}
       <BadgeShelf earnedBadgeIds={earnedBadgeIds} />
       <ul className="entries">
         {stops.map((stop) => (

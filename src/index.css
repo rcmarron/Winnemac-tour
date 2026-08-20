@@ -858,3 +858,43 @@ button.nearby__row:hover {
 .sheet__head {
   position: relative;
 }
+
+/* The finish, and the invitation to give */
+
+.support {
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border: 1px solid var(--leaf);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--leaf) 10%, var(--card));
+}
+
+.support__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--leaf);
+}
+
+.support__title {
+  margin: 0.2rem 0 0.4rem;
+  font-size: 1.15rem;
+}
+
+.support__text {
+  margin: 0 0 0.9rem;
+  color: var(--ink-soft);
+}
+
+.support__button {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.support__fine {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
