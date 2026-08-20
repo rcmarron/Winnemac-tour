@@ -70,6 +70,12 @@ One screen, no tabs. The map holds the top half; a sheet below it lists the
 stops closest to the visitor, re-sorting as they walk. "See all" slides the
 sheet up over the map to show the full journal, and "Show map" drops it back.
 
+The map's layers are created once and edited in place -- markers get a new icon
+only when a stop unlocks, and the visitor's dot is an SVG circle that moves
+rather than a div icon Leaflet rebuilds on every move. Recentring ignores
+movement under 4 m (`RECENTRE_THRESHOLD_M`), so a phone's twitch while standing
+still doesn't drag the map around.
+
 The map follows the visitor: it centres on them from the first fix and keeps
 centred as they walk. Dragging or zooming by hand hands control back (the
 button changes from "Following you" to "Centre on me", which resumes it). The

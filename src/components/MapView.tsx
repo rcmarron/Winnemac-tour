@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { mapPins, nextPin, pinBounds, type MapPin } from '../mapModel'
+import {
+  mapPins,
+  nextPin,
+  pinBounds,
+  shouldRecentre,
+  type MapPin,
+} from '../mapModel'
 import { PARK_CENTRE } from '../park'
 import type { Coordinates } from '../geo'
 import type { Stop } from '../types'
@@ -29,6 +35,31 @@ const MIN_FOLLOW_ZOOM = 16
  */
 const SELF_MOVE_GRACE_MS = 600
 
+interface MapViewProps {
+  stops: readonly Stop[]
+  unlockedStopIds: readonly string[]
+  position: Coordinates | null
+}
+
+const pinIcon = (unlocked: boolean) =>
+  L.divIcon({
+    className: `pin ${unlocked ? 'pin--unlocked' : 'pin--locked'}`,
+    html: `<span aria-hidden="true">${unlocked ? '★' : ''}</span>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  })
+
+/**
+ * The visitor's dot is an SVG circle rather than a div icon: Leaflet swaps a
+ * div icon's element on every setLatLng, which showed up as the dot blinking
+ * once a second. A circle marker just moves.
+ */
+const ME_STYLE: L.CircleMarkerOptions = {
+  radius: 6,
+  className: 'me-dot',
+  interactive: false,
+}
+
 /**
  * How far out to sit while following. Centred on the visitor, a fixed zoom can
  * leave the next stop outside the viewport -- and an empty map is no help in
@@ -47,22 +78,12 @@ function followZoom(instance: L.Map, position: Coordinates, target: MapPin | nul
   return Math.max(MIN_FOLLOW_ZOOM, Math.min(FOLLOW_ZOOM, fitted))
 }
 
-interface MapViewProps {
-  stops: readonly Stop[]
-  unlockedStopIds: readonly string[]
-  position: Coordinates | null
+/** One stop's drawing on the map, kept alive between renders. */
+interface StopLayer {
+  marker: L.Marker
+  zone: L.Circle
+  unlocked: boolean
 }
-
-const pinIcon = (unlocked: boolean) =>
-  L.divIcon({
-    className: `pin ${unlocked ? 'pin--unlocked' : 'pin--locked'}`,
-    html: `<span aria-hidden="true">${unlocked ? '★' : ''}</span>`,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-  })
-
-const meIcon = () =>
-  L.divIcon({ className: 'pin pin--me', html: '', iconSize: [16, 16], iconAnchor: [8, 8] })
 
 export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
   const container = useRef<HTMLDivElement | null>(null)
@@ -71,19 +92,30 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
   const framed = useRef(false)
   const centred = useRef(false)
 
-  // The map follows the visitor until they move it themselves; otherwise every
-  // position update would yank the view out from under them.
+  // Layers persist and are edited in place. Rebuilding them on every fix made
+  // the markers blink and fought the pan animation.
+  const stopLayers = useRef(new Map<string, StopLayer>())
+  const meMarker = useRef<L.CircleMarker | null>(null)
+  const lastCentre = useRef<Coordinates | null>(null)
+
   const following = useRef(true)
   const lastSelfMove = useRef(0)
   const framedTargetId = useRef<string | null>(null)
   const [isFollowing, setIsFollowing] = useState(true)
 
-  const pins = mapPins(stops, unlockedStopIds)
+  // A stable identity, so the drawing effect runs on real changes only.
+  const unlockedKey = unlockedStopIds.join('|')
+  const pins = useMemo(() => mapPins(stops, unlockedKey ? unlockedKey.split('|') : []), [
+    stops,
+    unlockedKey,
+  ])
 
   // Create the map once; Leaflet owns this DOM node from here on.
   useEffect(() => {
     if (!container.current || map.current) return
 
+    // Captured for the cleanup: the ref itself may point elsewhere by then.
+    const drawnStops = stopLayers.current
     const instance = L.map(container.current, { zoomControl: true, attributionControl: true })
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: TILE_ATTRIBUTION }).addTo(instance)
     overlay.current = L.layerGroup().addTo(instance)
@@ -110,43 +142,82 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
       instance.remove()
       map.current = null
       overlay.current = null
+      drawnStops.clear()
+      meMarker.current = null
       framed.current = false
       centred.current = false
+      lastCentre.current = null
     }
   }, [])
 
-  // Redraw pins whenever unlock state or the visitor's position changes.
+  // Stop pins and zones: added once, then only touched when something changed.
   useEffect(() => {
-    const instance = map.current
     const layer = overlay.current
-    if (!instance || !layer) return
+    if (!layer) return
 
-    layer.clearLayers()
+    const live = stopLayers.current
+    const seen = new Set<string>()
 
     for (const pin of pins) {
-      L.circle([pin.latitude, pin.longitude], {
-        radius: pin.radius,
-        className: `zone ${pin.unlocked ? 'zone--unlocked' : 'zone--locked'}`,
-      }).addTo(layer)
+      seen.add(pin.id)
+      const existing = live.get(pin.id)
 
-      L.marker([pin.latitude, pin.longitude], {
-        icon: pinIcon(pin.unlocked),
-        title: pin.name,
-        alt: pin.name,
-      })
-        .bindTooltip(pin.name, { direction: 'top', offset: [0, -12] })
-        .addTo(layer)
+      if (!existing) {
+        const zone = L.circle([pin.latitude, pin.longitude], {
+          radius: pin.radius,
+          className: `zone ${pin.unlocked ? 'zone--unlocked' : 'zone--locked'}`,
+        }).addTo(layer)
+
+        const marker = L.marker([pin.latitude, pin.longitude], {
+          icon: pinIcon(pin.unlocked),
+          title: pin.name,
+          alt: pin.name,
+        })
+          .bindTooltip(pin.name, { direction: 'top', offset: [0, -12] })
+          .addTo(layer)
+
+        live.set(pin.id, { marker, zone, unlocked: pin.unlocked })
+        continue
+      }
+
+      if (existing.unlocked !== pin.unlocked) {
+        existing.marker.setIcon(pinIcon(pin.unlocked))
+        // setStyle does not rewrite className, so set it on the path itself.
+        existing.zone
+          .getElement()
+          ?.setAttribute('class', `zone ${pin.unlocked ? 'zone--unlocked' : 'zone--locked'}`)
+        existing.unlocked = pin.unlocked
+      }
     }
 
-    if (position) {
-      L.marker([position.latitude, position.longitude], {
-        icon: meIcon(),
-        title: 'You are here',
-        alt: 'You are here',
-        zIndexOffset: 1000,
-      }).addTo(layer)
+    for (const [id, drawn] of live) {
+      if (seen.has(id)) continue
+      drawn.marker.remove()
+      drawn.zone.remove()
+      live.delete(id)
     }
-  }, [pins, position])
+  }, [pins])
+
+  // The visitor's own dot: moved, never rebuilt.
+  useEffect(() => {
+    const layer = overlay.current
+    if (!layer) return
+
+    if (!position) {
+      meMarker.current?.remove()
+      meMarker.current = null
+      return
+    }
+
+    const here = L.latLng(position.latitude, position.longitude)
+
+    if (!meMarker.current) {
+      meMarker.current = L.circleMarker(here, ME_STYLE).addTo(layer)
+      return
+    }
+
+    meMarker.current.setLatLng(here)
+  }, [position])
 
   // Keep the visitor in the middle for as long as they let us.
   useEffect(() => {
@@ -157,18 +228,24 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
       const target = nextPin(pins, position)
       const here = L.latLng(position.latitude, position.longitude)
       const targetChanged = framedTargetId.current !== (target?.id ?? null)
-      lastSelfMove.current = Date.now()
 
       if (!centred.current || targetChanged) {
         // Re-choose the zoom only on the first fix and when the next stop
         // changes, so walking never makes the map breathe in and out.
+        lastSelfMove.current = Date.now()
         instance.setView(here, followZoom(instance, position, target), { animate: false })
         centred.current = true
         framedTargetId.current = target?.id ?? null
-      } else {
-        // Same zoom, so glide: walking should feel continuous.
-        instance.panTo(here, { animate: true, duration: 0.6 })
+        lastCentre.current = position
+        return
       }
+
+      // Ignore twitch: chasing every fix is what made this feel unsteady.
+      if (!shouldRecentre(lastCentre.current, position)) return
+
+      lastSelfMove.current = Date.now()
+      lastCentre.current = position
+      instance.panTo(here, { animate: true, duration: 0.5 })
       return
     }
 
@@ -191,7 +268,7 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
     }
   }, [pins, position])
 
-  const centreOnMe = () => {
+  const centreOnMe = useCallback(() => {
     const instance = map.current
     if (!instance || !position) return
 
@@ -200,13 +277,11 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
     setIsFollowing(true)
     centred.current = true
     framedTargetId.current = target?.id ?? null
+    lastCentre.current = position
     lastSelfMove.current = Date.now()
     // Re-frame on the next stop, exactly as the first fix does.
-    instance.setView(
-      [position.latitude, position.longitude],
-      followZoom(instance, position, target),
-    )
-  }
+    instance.setView([position.latitude, position.longitude], followZoom(instance, position, target))
+  }, [pins, position])
 
   return (
     <div className="map">

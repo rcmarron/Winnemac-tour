@@ -603,11 +603,12 @@ h1 {
   border: 2px solid #fff;
 }
 
-.pin--me {
-  background: #2f6fd0;
-  border: 2px solid #fff;
-  /* Smaller than a stop pin, so standing on a stop doesn't hide it. */
-  transform: scale(0.7);
+/* The visitor's dot, drawn as SVG so moving it never rebuilds an element. */
+.me-dot {
+  fill: #2f6fd0;
+  fill-opacity: 1;
+  stroke: #fff;
+  stroke-width: 2.5;
 }
 
 .zone {

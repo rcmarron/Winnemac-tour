@@ -1,4 +1,4 @@
-import type { Coordinates } from './geo'
+import { distanceInMeters, type Coordinates } from './geo'
 import type { Stop } from './types'
 
 export interface MapPin {
@@ -65,4 +65,22 @@ export function nextPin(pins: readonly MapPin[], position: Coordinates | null): 
       (a.latitude - position.latitude) ** 2 + (a.longitude - position.longitude) ** 2
     return distance(pin) < distance(closest) ? pin : closest
   })
+}
+
+/**
+ * Whether the map should chase a new position.
+ *
+ * A phone reports a slightly different fix every second even when standing
+ * still, and recentring on each one makes the map twitch. Below this the map
+ * holds still.
+ */
+export const RECENTRE_THRESHOLD_M = 4
+
+export function shouldRecentre(
+  last: Coordinates | null,
+  next: Coordinates,
+  thresholdMeters: number = RECENTRE_THRESHOLD_M,
+): boolean {
+  if (!last) return true
+  return distanceInMeters(last, next) >= thresholdMeters
 }

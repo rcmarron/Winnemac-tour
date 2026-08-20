@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapPins, nextPin, pinBounds } from './mapModel'
+import { mapPins, nextPin, pinBounds, shouldRecentre } from './mapModel'
 import type { Stop } from './types'
 
 const stop = (overrides: Partial<Stop> & Pick<Stop, 'id'>): Stop => ({
@@ -79,5 +79,27 @@ describe('nextPin', () => {
 
   it('falls back to the first locked stop with no position yet', () => {
     expect(nextPin(mapPins([far, near], []), null)?.id).toBe('far')
+  })
+})
+
+describe('shouldRecentre', () => {
+  const here = { latitude: 41.975, longitude: -87.691 }
+
+  it('centres when there is nowhere to compare to', () => {
+    expect(shouldRecentre(null, here)).toBe(true)
+  })
+
+  it('holds still for GPS twitch', () => {
+    // ~1 m north: a standing-still phone, not a walking visitor.
+    expect(shouldRecentre(here, { latitude: 41.975009, longitude: -87.691 })).toBe(false)
+  })
+
+  it('follows a real step', () => {
+    // ~11 m north.
+    expect(shouldRecentre(here, { latitude: 41.9751, longitude: -87.691 })).toBe(true)
+  })
+
+  it('respects a custom threshold', () => {
+    expect(shouldRecentre(here, { latitude: 41.975009, longitude: -87.691 }, 0.5)).toBe(true)
   })
 })
