@@ -64,10 +64,18 @@ The game layer sits on top of Phase 1:
   Web Audio chime, and `navigator.vibrate` where it exists. Audio is primed by
   the Start tap, since browsers only allow sound to begin from a gesture.
 
-## Map view
+## Layout: map above, stops below
 
-The tour opens on a map, because the visitor's first question is where to
-walk. Leaflet with OpenStreetMap tiles: no API key, and the park's paths are
+One screen, no tabs. The map holds the top half; a sheet below it lists the
+stops closest to the visitor, re-sorting as they walk. "See all" slides the
+sheet up over the map to show the full journal, and "Show map" drops it back.
+
+The map is sized to the top half rather than the whole stage, so Leaflet frames
+stops into space the visitor can actually see instead of behind the sheet.
+`nearestStops` leaves undiscovered mysteries out of the closest list: a
+distance would point straight at one and spoil the find.
+
+Leaflet with OpenStreetMap tiles: no API key, and the park's paths are
 already mapped. Attribution is required and is rendered by the map.
 
 - Signposted stops are pins, each inside its trigger zone: dashed grey while
@@ -75,7 +83,6 @@ already mapped. Attribution is required and is rendered by the map.
   visitor's own dot sits on the pin.
 - Mystery stops are deliberately absent from the map (`mapPins` filters them);
   the journal teases them instead.
-- The header names the nearest stop still to unlock and how far it is.
 - Tiles need a data connection. GPS itself works offline, so with no signal
   unlocking still works -- the basemap is simply blank under the pins.
 

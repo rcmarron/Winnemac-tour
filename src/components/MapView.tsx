@@ -112,21 +112,19 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
   return (
     <div className="map">
       <div ref={container} className="map__canvas" role="application" aria-label="Tour map" />
-      <div className="map__actions">
-        <button
-          type="button"
-          className="button button--small"
-          onClick={centreOnMe}
-          disabled={!position}
-        >
-          Centre on me
-        </button>
-        <p className="map__legend">
-          <span className="legend__swatch legend__swatch--locked" aria-hidden="true" /> to visit
-          <span className="legend__swatch legend__swatch--unlocked" aria-hidden="true" /> unlocked
-          <span className="legend__swatch legend__swatch--me" aria-hidden="true" /> you
-        </p>
-      </div>
+      <button
+        type="button"
+        className="button button--small map__recentre"
+        onClick={centreOnMe}
+        disabled={!position}
+      >
+        Centre on me
+      </button>
+      <p className="map__legend">
+        <span className="legend__swatch legend__swatch--locked" aria-hidden="true" /> to visit
+        <span className="legend__swatch legend__swatch--unlocked" aria-hidden="true" /> unlocked
+        <span className="legend__swatch legend__swatch--me" aria-hidden="true" /> you
+      </p>
     </div>
   )
 }
