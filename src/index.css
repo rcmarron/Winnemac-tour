@@ -1,15 +1,191 @@
 :root {
-  font-family: system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
+  --ink: #1f2419;
+  --ink-soft: #5c6552;
+  --paper: #f7f5ef;
+  --card: #ffffff;
+  --line: #ded9cb;
+  --leaf: #3f6b3a;
+  --leaf-ink: #ffffff;
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.55;
   color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eceade;
+    --ink-soft: #a5ad98;
+    --paper: #14170f;
+    --card: #1e2318;
+    --line: #333a2a;
+    --leaf: #7fb069;
+    --leaf-ink: #10150c;
+  }
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
 }
 
-.app {
-  padding: 1.5rem;
-  max-width: 40rem;
+.screen {
+  max-width: 34rem;
   margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.screen--intro {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.lede {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+
+.button {
+  align-self: flex-start;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--leaf);
+  color: var(--leaf-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover {
+  filter: brightness(1.08);
+}
+
+.button--small {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.fine-print {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.tour__header {
+  margin-bottom: 1rem;
+}
+
+.tour__title {
+  font-size: 1.5rem;
+}
+
+.tour__count {
+  margin: 0.25rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--card);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.status--denied,
+.status--error,
+.status--unsupported {
+  border-color: #c2703f;
+  color: var(--ink);
+}
+
+.stops {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.stop {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--card);
+}
+
+.stop--locked {
+  opacity: 0.75;
+  border-style: dashed;
+}
+
+.stop--unlocked {
+  border-left: 4px solid var(--leaf);
+}
+
+.stop__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.stop__name {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.stop__badge {
+  flex: none;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.stop--unlocked .stop__badge {
+  color: var(--leaf);
+}
+
+.stop__text,
+.stop__hint {
+  margin: 0.6rem 0 0;
+}
+
+.stop__hint {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
 }

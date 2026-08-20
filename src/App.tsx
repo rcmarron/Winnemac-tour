@@ -1,13 +1,18 @@
+import { IntroScreen } from './components/IntroScreen'
+import { TourScreen } from './components/TourScreen'
 import { stops } from './stops'
+import { useProgress } from './useProgress'
 
-/** Placeholder shell -- the intro screen and GPS unlocking land in Phase 1. */
 export function App() {
-  const visible = stops.filter((stop) => !stop.isMystery)
+  const { progress, start, unlock } = useProgress()
+
+  const signpostedCount = stops.filter((stop) => !stop.isMystery).length
+
+  if (!progress.started) {
+    return <IntroScreen stopCount={signpostedCount} onStart={start} />
+  }
 
   return (
-    <main className="app">
-      <h1>Winnemac Park Tour</h1>
-      <p>Scaffold only. {visible.length} stops loaded, mysteries hidden.</p>
-    </main>
+    <TourScreen stops={stops} unlockedStopIds={progress.unlockedStopIds} onUnlock={unlock} />
   )
 }

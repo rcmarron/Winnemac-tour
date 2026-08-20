@@ -35,3 +35,21 @@ Because the site is served from a subpath, `vite.config.ts` sets
 
 One-time setup: in the repository's Settings -> Pages, set **Source** to
 **GitHub Actions**.
+
+## Phase 1 (current state)
+
+The core loop works end to end: QR/link -> intro screen -> location permission ->
+GPS unlocking -> text stops -> progress in local storage.
+
+- `src/geo.ts` -- haversine distance and trigger-zone containment.
+- `src/unlock.ts` -- pure logic: which stops a position unlocks, and which
+  stops the visitor may see (mysteries stay hidden until found).
+- `src/storage.ts` -- progress persisted to local storage, tolerant of blocked
+  or full storage.
+- `src/useGeolocation.ts` -- `watchPosition` wrapper, including denied and
+  unsupported states.
+- `src/useProgress.ts` -- unlocking is permanent; revisiting is always free.
+
+Still to come: the journal view, quizzes, badges and unlock celebration
+(Phase 2), the five mystery stops and mixed media (Phase 3), and the donation
+link (Phase 4). Stop coordinates in `src/stops.ts` are placeholders.
