@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findNewlyUnlocked, visibleStops } from './unlock'
+import { findNewlyUnlocked } from './unlock'
 import type { Stop } from './types'
 
 const stop = (overrides: Partial<Stop> & Pick<Stop, 'id'>): Stop => ({
@@ -36,25 +36,5 @@ describe('findNewlyUnlocked', () => {
   it('can unlock several overlapping stops at once', () => {
     const stops = [stop({ id: 'a' }), stop({ id: 'b' }), stop({ id: 'c', latitude: 41.99 })]
     expect(findNewlyUnlocked(near, stops, [])).toEqual(['a', 'b'])
-  })
-})
-
-describe('visibleStops', () => {
-  const signposted = stop({ id: 'oak' })
-  const mystery = stop({ id: 'secret', isMystery: true })
-
-  it('always lists signposted stops', () => {
-    expect(visibleStops([signposted], []).map((s) => s.id)).toEqual(['oak'])
-  })
-
-  it('hides mystery stops until they are found', () => {
-    expect(visibleStops([signposted, mystery], []).map((s) => s.id)).toEqual(['oak'])
-  })
-
-  it('reveals a mystery stop once unlocked', () => {
-    expect(visibleStops([signposted, mystery], ['secret']).map((s) => s.id)).toEqual([
-      'oak',
-      'secret',
-    ])
   })
 })

@@ -9,11 +9,20 @@ export interface Progress {
   started: boolean
   /** Stops walked into. Unlocking is permanent. */
   unlockedStopIds: string[]
+  /** Stops whose quiz answer the visitor has looked at. */
+  revealedQuizStopIds: string[]
+  /** Badges already awarded, so a badge is announced only once. */
+  earnedBadgeIds: string[]
 }
 
 const STORAGE_KEY = 'winnemac-tour:progress:v1'
 
-export const emptyProgress = (): Progress => ({ started: false, unlockedStopIds: [] })
+export const emptyProgress = (): Progress => ({
+  started: false,
+  unlockedStopIds: [],
+  revealedQuizStopIds: [],
+  earnedBadgeIds: [],
+})
 
 /**
  * localStorage throws in some privacy modes, so every access is guarded --
@@ -41,14 +50,21 @@ export function parseProgress(raw: string | null): Progress {
 
   if (typeof parsed !== 'object' || parsed === null) return emptyProgress()
 
-  const { started, unlockedStopIds } = parsed as Partial<Progress>
+  const { started, unlockedStopIds, revealedQuizStopIds, earnedBadgeIds } =
+    parsed as Partial<Progress>
 
   return {
     started: started === true,
-    unlockedStopIds: Array.isArray(unlockedStopIds)
-      ? unlockedStopIds.filter((id): id is string => typeof id === 'string')
-      : [],
+    unlockedStopIds: stringList(unlockedStopIds),
+    revealedQuizStopIds: stringList(revealedQuizStopIds),
+    earnedBadgeIds: stringList(earnedBadgeIds),
   }
+}
+
+/** Anything that isn't a list of strings becomes an empty list. */
+function stringList(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((entry): entry is string => typeof entry === 'string')
 }
 
 export function loadProgress(store: StorageLike | null = defaultStorage()): Progress {

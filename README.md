@@ -50,6 +50,20 @@ GPS unlocking -> text stops -> progress in local storage.
   unsupported states.
 - `src/useProgress.ts` -- unlocking is permanent; revisiting is always free.
 
-Still to come: the journal view, quizzes, badges and unlock celebration
-(Phase 2), the five mystery stops and mixed media (Phase 3), and the donation
-link (Phase 4). Stop coordinates in `src/stops.ts` are placeholders.
+## Phase 2 (current state)
+
+The game layer sits on top of Phase 1:
+
+- **Journal** -- every stop is listed, always. Locked stops show how far away
+  they are; undiscovered mysteries show as `???` plus their hint.
+- **Quizzes** (`src/badges.ts` consumes them) -- optional per stop, revealed on
+  a tap.
+- **Badges** -- First Discovery, Halfway There, and Park Naturalist, all
+  re-derived from what the visitor has done, so a badge can never be lost.
+- **Celebration** (`src/celebrate.ts`) -- an on-screen banner for everyone, a
+  Web Audio chime, and `navigator.vibrate` where it exists. Audio is primed by
+  the Start tap, since browsers only allow sound to begin from a gesture.
+
+Still to come: the five mystery stops and the Keen Eye badge, plus audio and
+video (Phase 3), and the donation link (Phase 4). Stop coordinates and quiz
+copy in `src/stops.ts` are placeholders.

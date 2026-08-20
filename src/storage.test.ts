@@ -28,9 +28,29 @@ describe('parseProgress', () => {
     expect(parseProgress('{ not json')).toEqual(emptyProgress())
   })
 
-  it('drops non-string entries from unlockedStopIds', () => {
-    const raw = JSON.stringify({ started: true, unlockedStopIds: ['oak', 7, null, 'elm'] })
-    expect(parseProgress(raw)).toEqual({ started: true, unlockedStopIds: ['oak', 'elm'] })
+  it('drops non-string entries from every id list', () => {
+    const raw = JSON.stringify({
+      started: true,
+      unlockedStopIds: ['oak', 7, null, 'elm'],
+      revealedQuizStopIds: ['oak', {}],
+      earnedBadgeIds: [false, 'first-discovery'],
+    })
+    expect(parseProgress(raw)).toEqual({
+      started: true,
+      unlockedStopIds: ['oak', 'elm'],
+      revealedQuizStopIds: ['oak'],
+      earnedBadgeIds: ['first-discovery'],
+    })
+  })
+
+  it('reads Phase 1 saves, which had no quiz or badge fields', () => {
+    const raw = JSON.stringify({ started: true, unlockedStopIds: ['oak'] })
+    expect(parseProgress(raw)).toEqual({
+      started: true,
+      unlockedStopIds: ['oak'],
+      revealedQuizStopIds: [],
+      earnedBadgeIds: [],
+    })
   })
 
   it('treats a missing started flag as not started', () => {
@@ -46,8 +66,14 @@ describe('load and save', () => {
   })
 
   it('round-trips progress', () => {
-    saveProgress({ started: true, unlockedStopIds: ['oak'] }, store)
-    expect(loadProgress(store)).toEqual({ started: true, unlockedStopIds: ['oak'] })
+    const saved = {
+      started: true,
+      unlockedStopIds: ['oak'],
+      revealedQuizStopIds: ['oak'],
+      earnedBadgeIds: ['first-discovery'],
+    }
+    saveProgress(saved, store)
+    expect(loadProgress(store)).toEqual(saved)
   })
 
   it('reads empty progress from an untouched store', () => {
@@ -55,7 +81,7 @@ describe('load and save', () => {
   })
 
   it('is a no-op when storage is unavailable', () => {
-    expect(() => saveProgress({ started: true, unlockedStopIds: [] }, null)).not.toThrow()
+    expect(() => saveProgress(emptyProgress(), null)).not.toThrow()
     expect(loadProgress(null)).toEqual(emptyProgress())
   })
 
@@ -66,6 +92,6 @@ describe('load and save', () => {
         throw new Error('quota exceeded')
       },
     }
-    expect(() => saveProgress({ started: true, unlockedStopIds: [] }, hostile)).not.toThrow()
+    expect(() => saveProgress(emptyProgress(), hostile)).not.toThrow()
   })
 })

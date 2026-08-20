@@ -13,6 +13,11 @@ export const stops: Stop[] = [
     radius: 25,
     isMystery: false,
     text: 'Placeholder text for the first stop.',
+    quiz: {
+      question: 'Roughly how old is the oak by the entrance?',
+      answer: 'Placeholder answer \u2014 to be written with the Council.',
+    },
+    countsForNaturalist: true,
   },
   {
     id: 'shagbark-hickory',

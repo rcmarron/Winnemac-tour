@@ -16,12 +16,3 @@ export function findNewlyUnlocked(
     .filter((stop) => !unlocked.has(stop.id) && isInsideZone(position, stop))
     .map((stop) => stop.id)
 }
-
-/**
- * What the visitor can see in the list: every signposted stop, plus mystery
- * stops once they've been found. Undiscovered mysteries stay invisible.
- */
-export function visibleStops(stops: readonly Stop[], unlockedStopIds: readonly string[]): Stop[] {
-  const unlocked = new Set(unlockedStopIds)
-  return stops.filter((stop) => !stop.isMystery || unlocked.has(stop.id))
-}
