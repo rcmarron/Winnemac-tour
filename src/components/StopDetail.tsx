@@ -1,8 +1,9 @@
 import { VideoEmbed } from './VideoEmbed'
+import { describeDistance } from '../nearest'
 import { distanceInMeters, type Coordinates } from '../geo'
 import type { Stop } from '../types'
 
-interface JournalEntryProps {
+interface StopDetailProps {
   stop: Stop
   unlocked: boolean
   quizRevealed: boolean
@@ -12,12 +13,12 @@ interface JournalEntryProps {
   onStartHunt: (stopId: string) => void
 }
 
-function describeDistance(meters: number): string {
-  if (meters < 1_000) return `${Math.round(meters)} m away`
-  return `${(meters / 1_000).toFixed(1)} km away`
-}
-
-export function JournalEntry({
+/**
+ * One stop, opened. This is what arriving pops up, and what tapping a row in
+ * the closest list opens -- so the content is one tap away rather than behind
+ * the full journal.
+ */
+export function StopDetail({
   stop,
   unlocked,
   quizRevealed,
@@ -25,53 +26,43 @@ export function JournalEntry({
   onRevealQuiz,
   onPlayNarration,
   onStartHunt,
-}: JournalEntryProps) {
+}: StopDetailProps) {
   const hidden = stop.isMystery && !unlocked
   const distance = position && !hidden ? distanceInMeters(position, stop) : null
 
   return (
-    <li
-      className={`entry ${unlocked ? 'entry--unlocked' : 'entry--locked'} ${
-        hidden ? 'entry--mystery' : ''
-      }`}
-    >
-      <div className="entry__header">
-        <h2 className="entry__name">{hidden ? '???' : stop.name}</h2>
-        <span className="entry__badge">
-          {unlocked ? (stop.isMystery ? 'Found' : 'Unlocked') : hidden ? 'Undiscovered' : 'Locked'}
-        </span>
-      </div>
+    <article className="detail">
+      <h3 className="detail__name">{hidden ? '???' : stop.name}</h3>
 
-      {unlocked && <p className="entry__text">{stop.text}</p>}
+      <p className="detail__status">
+        {unlocked
+          ? stop.isMystery
+            ? 'Found — a hidden stop, off the marked route'
+            : 'Unlocked'
+          : hidden
+            ? 'Undiscovered'
+            : `Walk here to unlock — ${describeDistance(distance)}`}
+      </p>
 
-      {unlocked && stop.isMystery && (
-        <p className="entry__note">A hidden stop, found off the marked route.</p>
-      )}
+      {unlocked && <p className="detail__text">{stop.text}</p>}
 
       {!unlocked && hidden && (
         <>
-          <p className="entry__hint">{stop.mysteryHint ?? 'Somewhere along the paths.'}</p>
-          <p className="entry__media">
-            <button
-              type="button"
-              className="button button--small button--quiet"
-              onClick={() => onStartHunt(stop.id)}
-            >
-              Hunt for it
-            </button>
-          </p>
+          <p className="detail__hint">{stop.mysteryHint ?? 'Somewhere along the paths.'}</p>
+          <button type="button" className="button" onClick={() => onStartHunt(stop.id)}>
+            Hunt for it
+          </button>
         </>
       )}
 
       {!unlocked && !hidden && (
-        <p className="entry__hint">
-          Walk here to unlock
-          {distance === null ? '' : ` — ${describeDistance(distance)}`}
+        <p className="detail__hint">
+          Its story unlocks when you arrive. Walking there is how you earn it.
         </p>
       )}
 
       {unlocked && stop.audioUrl && (
-        <p className="entry__media">
+        <p className="detail__media">
           <button
             type="button"
             className="button button--small button--quiet"
@@ -100,6 +91,6 @@ export function JournalEntry({
           )}
         </div>
       )}
-    </li>
+    </article>
   )
 }

@@ -469,6 +469,7 @@ h1 {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.8rem 1rem 0.6rem;
+  min-height: 3rem;
 }
 
 /* A grab handle, drawn above the heading row. */
@@ -718,4 +719,142 @@ h1 {
 .video--link {
   margin-top: 0.85rem;
   font-size: 0.9rem;
+}
+
+/* Sheet: a stop card sits taller than the resting list */
+
+.sheet--tall {
+  top: 28%;
+}
+
+.sheet__back {
+  border: none;
+  background: transparent;
+  color: var(--leaf);
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+  margin-right: -0.25rem;
+  cursor: pointer;
+}
+
+/* Closest list: rows are buttons now */
+
+.nearby li {
+  list-style: none;
+}
+
+button.nearby__row {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.nearby__row:hover {
+  border-color: var(--leaf);
+}
+
+.nearby__meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.nearby__chevron {
+  color: var(--ink-soft);
+  font-size: 1rem;
+}
+
+.nearby__empty {
+  list-style: none;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+/* One stop, opened */
+
+.detail__name {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.detail__status {
+  margin: 0.2rem 0 0.8rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.detail__text {
+  margin: 0 0 0.5rem;
+}
+
+.detail__hint {
+  margin: 0 0 0.9rem;
+  color: var(--ink-soft);
+}
+
+.detail__media {
+  margin: 0.75rem 0 0;
+}
+
+/* Hunting a hidden stop */
+
+.hunt {
+  padding: 0.5rem 0 0;
+  text-align: center;
+}
+
+.hunt__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.hunt__trend {
+  margin: 0.35rem 0 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.hunt--warmer .hunt__trend {
+  color: #c2521f;
+}
+
+.hunt--colder .hunt__trend {
+  color: #2f6fd0;
+}
+
+.hunt__band {
+  margin: 0.3rem 0 0;
+  font-weight: 600;
+}
+
+.hunt__hint {
+  margin: 0.6rem auto 1rem;
+  max-width: 26rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* Present for screen readers, absent on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sheet__head {
+  position: relative;
 }

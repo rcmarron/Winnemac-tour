@@ -123,5 +123,23 @@ may overlap, and every mystery must carry a hint.
 `public/media/placeholder-narration.wav` is a two-tone stand-in so the audio
 path is real and testable. Replace it with the Council's recordings.
 
+## Arriving, and hunting
+
+Arriving at a stop opens its card in the sheet, with the text, narration and
+quiz right there. Rows in the closest list are buttons that open the same card,
+so content is always one tap away rather than behind the full journal.
+
+Unlocking allows for the reported GPS accuracy, capped at 20 m
+(`MAX_ACCURACY_ALLOWANCE_M`). Under summer canopy a phone often reports a
+20-30 m accuracy circle, and a visitor standing at a stop can be placed outside
+a 20 m zone -- arriving and having nothing happen is the worst failure this app
+has.
+
+Undiscovered mysteries can be hunted: `hunt.ts` reports warmer or colder plus
+a coarse proximity band, never a distance or a bearing, and treats movement
+under 6 m as GPS noise so the verdict doesn't flap while standing still. An
+arrival at some *other* stop does not end a hunt in progress; finding the
+hunted stop does, with the reveal.
+
 Still to come: the donation link (Phase 4). Stop names, exact positions, radii,
 quiz copy, and all media still need confirming with the Park Council.
