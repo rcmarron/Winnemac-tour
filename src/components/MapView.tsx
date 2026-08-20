@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { mapPins, nextPin, pinBounds, type MapPin } from '../mapModel'
+import { PARK_CENTRE } from '../park'
 import type { Coordinates } from '../geo'
 import type { Stop } from '../types'
 
@@ -12,11 +13,14 @@ import type { Stop } from '../types'
 const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
-/** Closest we zoom while following: near enough to read the paths around you. */
-const FOLLOW_ZOOM = 17
+/** Closest we zoom while following: near enough to pick out the right path. */
+const FOLLOW_ZOOM = 18
 
-/** Furthest we back off to keep the next stop in frame. */
-const MIN_FOLLOW_ZOOM = 14
+/**
+ * Furthest we back off to keep the next stop in frame. The park is only about
+ * 400 m across, so 16 already holds the whole of it.
+ */
+const MIN_FOLLOW_ZOOM = 16
 
 /**
  * Zoom events fired this recently are treated as ours rather than the
@@ -85,7 +89,8 @@ export function MapView({ stops, unlockedStopIds, position }: MapViewProps) {
     overlay.current = L.layerGroup().addTo(instance)
 
     lastSelfMove.current = Date.now()
-    instance.setView([41.9754, -87.6907], 16)
+    // Somewhere sensible for the moment before the first fix arrives.
+    instance.setView([PARK_CENTRE.latitude, PARK_CENTRE.longitude], 16)
 
     const releaseFollow = () => {
       if (!following.current) return

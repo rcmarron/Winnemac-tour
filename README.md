@@ -93,6 +93,17 @@ already mapped. Attribution is required and is rendered by the map.
 - Tiles need a data connection. GPS itself works offline, so with no signal
   unlocking still works -- the basemap is simply blank under the pins.
 
+## Stop coordinates
+
+`src/park.ts` holds the park outline taken from OpenStreetMap way 27860785 --
+the same data the basemap is drawn from, so stops and paths agree. It is
+bounded by Foster Ave, Damen Ave, Argyle St and Leavitt St, about 400 m square.
+
+The stops in `src/stops.ts` sit inside that outline, but they are approximations
+of plausible spots rather than a survey. `stops.test.ts` guards the geography:
+every stop, and its whole trigger zone, must fall inside the park, no two zones
+may overlap, and every mystery must carry a hint.
+
 Still to come: the five mystery stops and the Keen Eye badge, plus audio and
-video (Phase 3), and the donation link (Phase 4). Stop coordinates and quiz
-copy in `src/stops.ts` are placeholders.
+video (Phase 3), and the donation link (Phase 4). Stop names, exact positions,
+radii, and quiz copy all still need confirming with the Park Council.
