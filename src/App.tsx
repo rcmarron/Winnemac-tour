@@ -1,5 +1,5 @@
 import { IntroScreen } from './components/IntroScreen'
-import { TourScreen } from './components/TourScreen'
+import { TourShell } from './components/TourShell'
 import { stops } from './stops'
 import { useProgress } from './useProgress'
 
@@ -12,7 +12,7 @@ export function App() {
   }
 
   return (
-    <TourScreen
+    <TourShell
       stops={stops}
       progress={progress}
       notices={notices}

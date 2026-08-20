@@ -335,3 +335,142 @@ h1 {
     animation: none;
   }
 }
+
+/* View tabs */
+
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: var(--card);
+  color: var(--ink-soft);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab--active {
+  border-color: var(--leaf);
+  background: var(--leaf);
+  color: var(--leaf-ink);
+}
+
+/* Map */
+
+.map__canvas {
+  height: min(60svh, 26rem);
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  /* Leaflet paints its own tiles; keep a calm ground while they load. */
+  background: var(--card);
+  z-index: 0;
+}
+
+.map__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.map__legend {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.legend__swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend__swatch:not(:first-child) {
+  margin-left: 0.5rem;
+}
+
+.legend__swatch--locked {
+  border: 2px solid var(--ink-soft);
+}
+
+.legend__swatch--unlocked {
+  background: var(--leaf);
+}
+
+.legend__swatch--me {
+  background: #2f6fd0;
+}
+
+/* Leaflet markers, drawn in CSS so there are no image assets to ship. */
+
+.pin {
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.pin--locked {
+  background: #fff;
+  border: 3px solid #4a5340;
+}
+
+.pin--unlocked {
+  background: var(--leaf);
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.pin--me {
+  background: #2f6fd0;
+  border: 2px solid #fff;
+  /* Smaller than a stop pin, so standing on a stop doesn't hide it. */
+  transform: scale(0.7);
+}
+
+.zone {
+  fill-opacity: 0.12;
+  stroke-width: 2;
+}
+
+/* Dashed and grey: somewhere still to walk into. */
+.zone--locked {
+  stroke: #4a5340;
+  fill: #4a5340;
+  stroke-dasharray: 5 4;
+}
+
+/* Solid green: already yours. Readable even when your own dot covers the pin. */
+.zone--unlocked {
+  stroke: #2f7a2a;
+  fill: #2f7a2a;
+  fill-opacity: 0.22;
+  stroke-width: 3;
+}
+
+/* Leaflet's own chrome, toned to match the tour. */
+
+.leaflet-container {
+  font: inherit;
+  border-radius: 0.9rem;
+}
+
+.leaflet-control-attribution {
+  font-size: 0.65rem;
+}

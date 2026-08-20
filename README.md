@@ -64,6 +64,21 @@ The game layer sits on top of Phase 1:
   Web Audio chime, and `navigator.vibrate` where it exists. Audio is primed by
   the Start tap, since browsers only allow sound to begin from a gesture.
 
+## Map view
+
+The tour opens on a map, because the visitor's first question is where to
+walk. Leaflet with OpenStreetMap tiles: no API key, and the park's paths are
+already mapped. Attribution is required and is rendered by the map.
+
+- Signposted stops are pins, each inside its trigger zone: dashed grey while
+  locked, solid green once unlocked, so arriving is legible even when the
+  visitor's own dot sits on the pin.
+- Mystery stops are deliberately absent from the map (`mapPins` filters them);
+  the journal teases them instead.
+- The header names the nearest stop still to unlock and how far it is.
+- Tiles need a data connection. GPS itself works offline, so with no signal
+  unlocking still works -- the basemap is simply blank under the pins.
+
 Still to come: the five mystery stops and the Keen Eye badge, plus audio and
 video (Phase 3), and the donation link (Phase 4). Stop coordinates and quiz
 copy in `src/stops.ts` are placeholders.
