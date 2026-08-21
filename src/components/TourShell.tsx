@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { HuntPanel } from './HuntPanel'
 import { MapView } from './MapView'
+import { Modal } from './Modal'
 import { NarrationBar } from './NarrationBar'
 import { NoticeBanner } from './NoticeBanner'
+import { StopDetail } from './StopDetail'
 import { StopSheet } from './StopSheet'
 import { useGeolocation } from '../useGeolocation'
 import { useNarration } from '../useNarration'
 import { findNewlyUnlocked } from '../unlock'
 import { distanceInMeters } from '../geo'
 import { initialHuntReading, nextHuntReading, type HuntReading } from '../hunt'
-import type { SheetMode } from './StopSheet'
+
+/** What the modal is showing, if anything. */
+type ModalView = { kind: 'stop'; stopId: string } | { kind: 'hunt'; stopId: string } | null
 import type { Progress } from '../storage'
 import type { Notice } from '../useProgress'
 import type { Stop } from '../types'
@@ -31,8 +36,7 @@ export function TourShell({
   onDismissNotice,
 }: TourShellProps) {
   const [expanded, setExpanded] = useState(false)
-  const [sheetMode, setSheetMode] = useState<SheetMode>('list')
-  const [focusedStopId, setFocusedStopId] = useState<string | null>(null)
+  const [modal, setModal] = useState<ModalView>(null)
   const [hunt, setHunt] = useState<HuntReading>(initialHuntReading)
   const { status, position, accuracy, message, retry } = useGeolocation(true)
   const narration = useNarration(import.meta.env.BASE_URL)
@@ -41,35 +45,36 @@ export function TourShell({
   const playNarration = useCallback(
     (stop: Stop) => {
       if (!stop.audioUrl) return
+
+      // Already this stop's track: the modal covers the narration bar, so the
+      // same button has to be able to pause it.
+      if (narration.track?.stopId === stop.id) {
+        narration.toggle()
+        return
+      }
+
       narration.start({ stopId: stop.id, name: stop.name, audioUrl: stop.audioUrl })
     },
     [narration],
   )
 
   const openStop = useCallback((stopId: string) => {
-    setFocusedStopId(stopId)
-    setSheetMode('stop')
-    setExpanded(false)
+    setModal({ kind: 'stop', stopId })
   }, [])
 
   const startHunt = useCallback((stopId: string) => {
-    setFocusedStopId(stopId)
-    setSheetMode('hunt')
-    setExpanded(false)
+    setModal({ kind: 'hunt', stopId })
     setHunt(initialHuntReading)
   }, [])
 
-  const backToList = useCallback(() => {
-    setSheetMode('list')
-    setFocusedStopId(null)
+  const closeModal = useCallback(() => {
+    setModal(null)
     setHunt(initialHuntReading)
   }, [])
 
   // Read inside the arrival effect without making it re-run on every change.
-  const modeRef = useRef(sheetMode)
-  const focusedRef = useRef(focusedStopId)
-  modeRef.current = sheetMode
-  focusedRef.current = focusedStopId
+  const modalRef = useRef(modal)
+  modalRef.current = modal
 
   // Narration starts on arrival, where a stop has any: the visitor should be
   // able to pocket the phone and listen. Announced arrivals are tracked so a
@@ -91,7 +96,7 @@ export function TourShell({
       // announces it, and the journal still has it. Finding the hunted stop
       // does open, since that is the reveal the hunt was for.
       const huntingSomethingElse =
-        modeRef.current === 'hunt' && focusedRef.current !== notice.stopId
+        modalRef.current?.kind === 'hunt' && modalRef.current.stopId !== notice.stopId
 
       if (!huntingSomethingElse) openStop(notice.stopId)
       if (arrived?.audioUrl) playNarration(arrived)
@@ -105,13 +110,13 @@ export function TourShell({
     if (newlyUnlocked.length > 0) onUnlock(newlyUnlocked)
   }, [position, stops, unlockedStopIds, accuracy, onUnlock])
 
-  const focusedStop = focusedStopId
-    ? (stops.find((stop) => stop.id === focusedStopId) ?? null)
-    : null
+  const modalStop = modal ? (stops.find((stop) => stop.id === modal.stopId) ?? null) : null
 
   // Warmer or colder, recomputed as the visitor moves.
   const huntDistance =
-    sheetMode === 'hunt' && focusedStop && position ? distanceInMeters(position, focusedStop) : null
+    modal?.kind === 'hunt' && modalStop && position
+      ? distanceInMeters(position, modalStop)
+      : null
 
   useEffect(() => {
     if (huntDistance === null) return
@@ -156,20 +161,42 @@ export function TourShell({
           stops={stops}
           progress={progress}
           position={position}
-          mode={sheetMode}
-          focusedStop={focusedStop}
           expanded={expanded}
-          huntTrend={hunt.trend}
-          huntDistance={huntDistance}
           onToggleExpanded={() => setExpanded((open) => !open)}
-          onFocusStop={openStop}
-          onBackToList={backToList}
+          onOpenStop={openStop}
           onRevealQuiz={onRevealQuiz}
           onPlayNarration={playNarration}
           onStartHunt={startHunt}
-          onGiveUpHunt={backToList}
         />
       </div>
+
+      {modal?.kind === 'stop' && modalStop && (
+        // The card carries its own heading, so the modal's is for screen
+        // readers only.
+        <Modal title={modalStop.name} titleHidden onClose={closeModal}>
+          <StopDetail
+            stop={modalStop}
+            unlocked={unlockedStopIds.includes(modalStop.id)}
+            quizRevealed={progress.revealedQuizStopIds.includes(modalStop.id)}
+            narrationPlaying={narration.track?.stopId === modalStop.id && narration.playing}
+            position={position}
+            onRevealQuiz={onRevealQuiz}
+            onPlayNarration={playNarration}
+            onStartHunt={startHunt}
+          />
+        </Modal>
+      )}
+
+      {modal?.kind === 'hunt' && modalStop && (
+        <Modal title="Hunting a hidden stop" titleHidden onClose={closeModal}>
+          <HuntPanel
+            hint={modalStop.mysteryHint ?? 'Somewhere along the paths.'}
+            trend={hunt.trend}
+            distanceMeters={huntDistance}
+            onGiveUp={closeModal}
+          />
+        </Modal>
+      )}
 
       {narration.track && (
         <NarrationBar

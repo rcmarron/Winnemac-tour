@@ -145,9 +145,15 @@ path is real and testable. Replace it with the Council's recordings.
 
 ## Arriving, and hunting
 
-Arriving at a stop opens its card in the sheet, with the text, narration and
-quiz right there. Rows in the closest list are buttons that open the same card,
-so content is always one tap away rather than behind the full journal.
+Arriving at a stop opens its card in a modal, with the text, narration and quiz
+right there. Rows in the closest list are buttons that open the same modal, so
+content is always one tap away rather than behind the full journal.
+
+The modal is a native `<dialog>` (`Modal.tsx`), so Escape, focus trapping, the
+backdrop and taking the page behind it out of the tab order all come from the
+browser. It closes on Escape, on the close button, and on a tap outside. A
+dialog sits in the top layer, above the narration bar, so the card carries its
+own play/pause control for the stop it is showing.
 
 Unlocking allows for the reported GPS accuracy, capped at 20 m
 (`MAX_ACCURACY_ALLOWANCE_M`). Under summer canopy a phone often reports a
@@ -155,7 +161,8 @@ Unlocking allows for the reported GPS accuracy, capped at 20 m
 a 20 m zone -- arriving and having nothing happen is the worst failure this app
 has.
 
-Undiscovered mysteries can be hunted: `hunt.ts` reports warmer or colder plus
+Undiscovered mysteries can be hunted, in the same modal: `hunt.ts` reports
+warmer or colder plus
 a coarse proximity band, never a distance or a bearing, and treats movement
 under 6 m as GPS noise so the verdict doesn't flap while standing still. An
 arrival at some *other* stop does not end a hunt in progress; finding the

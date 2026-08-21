@@ -7,6 +7,8 @@ interface StopDetailProps {
   stop: Stop
   unlocked: boolean
   quizRevealed: boolean
+  /** True when this stop's narration is the one currently playing. */
+  narrationPlaying?: boolean
   position: Coordinates | null
   onRevealQuiz: (stopId: string) => void
   onPlayNarration: (stop: Stop) => void
@@ -22,6 +24,7 @@ export function StopDetail({
   stop,
   unlocked,
   quizRevealed,
+  narrationPlaying = false,
   position,
   onRevealQuiz,
   onPlayNarration,
@@ -68,7 +71,7 @@ export function StopDetail({
             className="button button--small button--quiet"
             onClick={() => onPlayNarration(stop)}
           >
-            Play narration
+            {narrationPlaying ? 'Pause narration' : 'Play narration'}
           </button>
         </p>
       )}
