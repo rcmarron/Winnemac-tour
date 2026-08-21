@@ -790,7 +790,13 @@ button.nearby__row:hover {
 /* Hunting a hidden stop */
 
 .hunt {
-  padding: 0.5rem 0 0;
+  /* One focused message on a full-height panel: centre it rather than leaving
+     it stranded at the top. */
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem 0 2rem;
   text-align: center;
 }
 
@@ -820,6 +826,11 @@ button.nearby__row:hover {
 .hunt__band {
   margin: 0.3rem 0 0;
   font-weight: 600;
+}
+
+.hunt .button {
+  /* .button aligns to the start by default; the hunt is a centred column. */
+  align-self: center;
 }
 
 .hunt__hint {
@@ -888,15 +899,25 @@ button.nearby__row:hover {
 /* Modal: a stop's content, or a hunt in progress */
 
 .modal {
-  /* Anchored to the bottom, where a thumb already is. */
-  width: 100%;
-  max-width: 34rem;
-  margin: auto auto 0;
+  /* Nearly full screen, with a margin the dimmed map shows through. */
+  --modal-gap: 0.85rem;
+
+  /* A dialog's UA style is width/height: fit-content with margin: auto, so
+     short content (a hunt, say) would otherwise shrink to a small box in the
+     middle instead of filling the inset. */
+  width: auto;
+  height: auto;
+  margin: 0;
+  max-width: none;
+  max-height: none;
+  inset: calc(var(--modal-gap) + env(safe-area-inset-top))
+    calc(var(--modal-gap) + env(safe-area-inset-right))
+    calc(var(--modal-gap) + env(safe-area-inset-bottom))
+    calc(var(--modal-gap) + env(safe-area-inset-left));
   padding: 0;
   border: none;
   background: transparent;
   color: var(--ink);
-  max-height: 88svh;
   overscroll-behavior: contain;
 }
 
@@ -907,10 +928,11 @@ button.nearby__row:hover {
 .modal__panel {
   display: flex;
   flex-direction: column;
-  max-height: 88svh;
+  height: 100%;
   background: var(--paper);
-  border-radius: 1.1rem 1.1rem 0 0;
-  box-shadow: 0 -10px 30px rgb(0 0 0 / 0.3);
+  border-radius: 1.1rem;
+  box-shadow: 0 8px 34px rgb(0 0 0 / 0.35);
+  overflow: hidden;
 }
 
 .modal__head {
@@ -954,14 +976,15 @@ button.nearby__row:hover {
   padding: 0 1.1rem calc(1.4rem + env(safe-area-inset-bottom));
 }
 
-@media (min-width: 36rem) {
-  /* Room to float it away from the edge on a larger screen. */
+@media (min-width: 40rem) {
+  /* A larger screen does not need a full-bleed panel. */
   .modal {
-    margin: auto;
-  }
+    --modal-gap: 2rem;
 
-  .modal__panel {
-    border-radius: 1.1rem;
+    width: min(34rem, calc(100vw - 4rem));
+    height: min(46rem, calc(100svh - 4rem));
+    inset: auto;
+    margin: auto;
   }
 }
 
@@ -972,7 +995,7 @@ button.nearby__row:hover {
 @keyframes modal-in {
   from {
     opacity: 0;
-    transform: translateY(1.5rem);
+    transform: translateY(1rem) scale(0.98);
   }
 }
 

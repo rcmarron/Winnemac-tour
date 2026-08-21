@@ -155,6 +155,16 @@ browser. It closes on Escape, on the close button, and on a tap outside. A
 dialog sits in the top layer, above the narration bar, so the card carries its
 own play/pause control for the stop it is showing.
 
+It fills the screen bar a small even gap, which the dimmed map shows through.
+Note that a dialog's UA style is `width`/`height: fit-content` with
+`margin: auto`, so both have to be overridden or short content (a hunt) shrinks
+to a box in the middle.
+
+Media works inside it, verified in Chromium: an iframe embed plays video, takes
+taps, and can go fullscreen from within the dialog (a fullscreened element joins
+the same top layer). Closing the modal unmounts the embed, so nothing keeps
+playing unseen.
+
 Unlocking allows for the reported GPS accuracy, capped at 20 m
 (`MAX_ACCURACY_ALLOWANCE_M`). Under summer canopy a phone often reports a
 20-30 m accuracy circle, and a visitor standing at a stop can be placed outside
